@@ -1,0 +1,4 @@
+include README.md
+recursive-include roll_engine/models *
+recursive-include roll_engine/fsm *
+recursive-include roll_engine/utils *

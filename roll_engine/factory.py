@@ -50,7 +50,7 @@ class BatchFactory(object):
                 percentage = int(pattern_str.strip('%'))
                 if not 0 < percentage <= self.max_percentage:
                     raise BatchPatternError(
-                        'percentage should be a value located in (0, {0}]%'
+                        'percentage should be a value located in (0, {}]%'
                         .format(self.max_percentage))
                 percentages = [percentage for _ in range(100/percentage)]
                 if 100 % percentage:
@@ -72,7 +72,7 @@ class BatchFactory(object):
                     raise BatchPatternError('illegal pattern')
         except (ValueError, BatchPatternError) as e:
             raise BatchPatternError(e)
-        return self.delimiter.join(['{0}%'.format(p) for p in percentages])
+        return self.delimiter.join(['{}%'.format(p) for p in percentages])
 
     def generate_deployment_batches(self, deployment, servers, forts=None):
         if forts is None:
@@ -89,7 +89,7 @@ class BatchFactory(object):
                         deployment=deployment, index=idx)
                     self.generate_deployment_targets(batch, tgts)
         except IntegrityError as e:
-            raise IntegrityError('Generate batches and targets error: {0}'
+            raise IntegrityError('Generate batches and targets error: {}'
                                  .format(e))
 
     def generate_deployment_targets(self, deployment_batch, batch_servers):

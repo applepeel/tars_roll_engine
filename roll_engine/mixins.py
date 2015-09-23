@@ -36,7 +36,7 @@ def _revoke_chain(task_id, terminate=False):
     while result:
         status = result.status
         children = result.children
-        logger.warning("Result {0} status: {1}".format(result.id, status))
+        logger.warning("Result {} status: {}".format(result.id, status))
 
         if status in states.UNREADY_STATES:
             result.revoke(terminate=terminate)
@@ -145,7 +145,7 @@ class BrakeMixin(object):
         extra = {'deploy': self}
         re_logger.info('Deployment braked', extra=extra)
 
-        action = '{0}_brake'.format(status)
+        action = '{}_brake'.format(status)
         self.trans(action)
 
         # brake_method raise Terminated error in some case, call it at the end
@@ -156,7 +156,7 @@ class BrakeMixin(object):
     def resume(self, operator=None):
         extra = {'deploy': self, 'operator': operator}
         re_logger.info('Deployment resumed', extra=extra)
-        action = '{0}_resume'.format(self.status.lower())
+        action = '{}_resume'.format(self.status.lower())
         handler = self.get_resume_handler()
         handler(action)
 
@@ -181,7 +181,7 @@ class RetryMixin(object):
         extra = {'deploy': self, 'operator': operator}
         re_logger.info('Retry deployment', extra=extra)
         handler = self.get_retry_handler()
-        action = '{0}_retry'.format(handler.__name__)
+        action = '{}_retry'.format(handler.__name__)
         handler(action)
 
 

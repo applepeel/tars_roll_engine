@@ -31,7 +31,7 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
         return
         for meta in ['batch_factory', 'task_set']:
             if meta not in dir(cls._meta):
-                raise MetaMissing('missing {0} in Meta of {1} Model'.
+                raise MetaMissing('missing {} in Meta of {} Model'.
                                   format(meta, cls.__name__))
 
     def get_object(self):
@@ -97,18 +97,18 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
             try:
                 action_method = getattr(self, action)
             except AttributeError:
-                raise ActionNotExist('Action {0} is not defined'.format(action))
+                raise ActionNotExist('Action {} is not defined'.format(action))
             else:
                 action_method(operator=user)
         else:
-            error_msg = ('action {0} is forbidden since deployment {1} in '
-                         '{2} status').format(action, self.id, self.status)
+            error_msg = ('action {0} is forbidden since deployment {1.id} in '
+                         '{1.status} status').format(action, self)
             available_actions = self.next_user_actions()
             if available_actions:
-                error_msg = '{0} is only available to [{1}]'\
+                error_msg = '{} is only available to [{}]'\
                     .format(error_msg, ', '.join(available_actions))
             else:
-                error_msg = '{0} has reached terminal status'\
+                error_msg = '{} has reached terminal status'\
                     .format(error_msg)
             raise ActionNotAllowed(error_msg)
 
@@ -151,7 +151,7 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
     @classmethod
     def validate_meta(cls):
         if 'smoke_success_status' not in dir(cls._meta):
-            raise MetaMissing('missing smoke_success_status in Meta of {0}'
+            raise MetaMissing('missing smoke_success_status in Meta of {}'
                               ' Model'.format(cls.__name__))
         super(FortFSMixin, cls).validate_meta()
 

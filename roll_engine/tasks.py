@@ -22,7 +22,7 @@ def on_error(func):
         try:
             func(*args, **kwargs)
         except Exception:
-            celery_logger.exception('calling "{0}" error'.format(func.__name__))
+            celery_logger.exception('calling "{}" error'.format(func.__name__))
     return error_wrapper
 
 
@@ -195,15 +195,15 @@ class Tasks(object):
 
     @classmethod
     def roll_job(cls):
-        raise JobMissing('missing roll_job definition in Task Set {0}'.
+        raise JobMissing('missing roll_job definition in Task Set {}'.
                          format(cls.__name__))
 
     @classmethod
     def smoke_job(cls):
-        raise JobMissing('missing smoke_job definition in Task Set {0}'.
+        raise JobMissing('missing smoke_job definition in Task Set {}'.
                          format(cls.__name__))
 
     @classmethod
     def bake_job(cls):
-        raise JobMissing('missing bake_job definition in Task Set {0}'.
+        raise JobMissing('missing bake_job definition in Task Set {}'.
                          format(cls.__name__))

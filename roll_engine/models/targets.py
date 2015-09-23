@@ -24,7 +24,7 @@ class DeploymentTarget(TargetMixin, FSMedModel):
     @classmethod
     def validate_meta(cls):
         if 'salt_timeout' not in dir(cls._meta):
-            raise MetaMissing('missing salt_timeout in Meta of {0} Model'.
+            raise MetaMissing('missing salt_timeout in Meta of {} Model'.
                               format(cls.__name__))
 
     def get_object(self):
@@ -58,7 +58,7 @@ class DeploymentTarget(TargetMixin, FSMedModel):
                 hostname, module_func, *args, **kwargs)
         except Exception as e:
             resp = {}
-            description = 'salt error: {0}'.format(e)
+            description = 'salt error: {}'.format(e)
         description = description or 'view agent log for detail'
 
         if hostname in resp and resp[hostname]:

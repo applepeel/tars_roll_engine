@@ -24,8 +24,8 @@ def log_action(msg=''):
             operator = kwargs.get('operator', AnonymousUser())
             kwargs['operator'] = tuple(getattr(operator, attr, '')
                                        for attr in ('username', 'email'))
-            deployment.actions.create(action=func.__name__,
-                                      message=msg, operator=operator)
+            deployment.actions.create(action=func.__name__, message=msg,
+                                      operator=kwargs['operator'][0])
             func(deployment, *args, **kwargs)
         return func_wrapper
     return decorator
@@ -158,7 +158,7 @@ class BrakeMixin(object):
         re_logger.info('Deployment resumed', extra=extra)
         action = '{}_resume'.format(self.status.lower())
         handler = self.get_resume_handler()
-        handler(action)
+        handler(action, operator=operator)
 
 
 class RevokeMixin(object):
@@ -182,7 +182,7 @@ class RetryMixin(object):
         re_logger.info('Retry deployment', extra=extra)
         handler = self.get_retry_handler()
         action = '{}_retry'.format(handler.__name__)
-        handler(action)
+        handler(action, operator=operator)
 
 
 class BatchMixin(object):

@@ -1,23 +1,26 @@
 from __future__ import absolute_import
 
 import logging
+import pytz
 from datetime import datetime
 
 
 class RollEngineFormatter(logging.Formatter):
 
     def format(self, record):
-        def format_time(timestamp):
-            return datetime.fromtimestamp(timestamp).isoformat()[:-3] + 'Z'
-
         if record.exc_info and not record.exc_text:
             # Cache the traceback text to avoid converting it multiple times
             # (it's constant anyway)
             record.exc_text = self.formatException(record.exc_info)
 
+        cur_dt = datetime.fromtimestamp(record.created).isoformat()[:-3]+'Z'
+        utc_dt = datetime.fromtimestamp(record.created, tz=pytz.utc)\
+            .isoformat()[:-9]+'Z'
+
         log = {
             'log_level': record.levelname,
-            'log_timestamp': format_time(record.created),
+            'log_timestamp': cur_dt,
+            'log_timestamp_utc': utc_dt,
             'detail': record.msg,
             'stacktrace': record.exc_text or '',
         }

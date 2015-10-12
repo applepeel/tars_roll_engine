@@ -7,6 +7,7 @@ from .batches import *
 from .targets import *
 from .actions import *
 from .configs import *
+from .base import FSMedModel
 
 
 __all__ = [v for k, v in globals().items()

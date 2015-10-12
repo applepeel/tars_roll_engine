@@ -9,13 +9,13 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='roll_engine',
-    version='0.1',
+    version='1.0',
     packages=['roll_engine'],
     include_package_data=True,
     license='BSD License',  # example license
     description='Ctrip rollout engine',
     long_description=README,
-    url='http://git.dev.sh.ctripcorp.com/gxdong/django-roll-engine/',
+    url='http://git.dev.sh.ctripcorp.com/tars/django-roll-engine/',
     author='dalang',
     author_email='gxdong@ctrip.com',
     classifiers=[

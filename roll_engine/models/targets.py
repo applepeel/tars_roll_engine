@@ -61,7 +61,9 @@ class DeploymentTarget(TargetMixin, FSMedModel):
             description = 'salt error: {}'.format(e)
         description = description or 'view agent log for detail'
 
-        if hostname in resp and resp[hostname]:
-            return True, description
-        else:
-            return False, description
+        if hostname in resp:
+            if isinstance(resp[hostname], basestring):
+                return True, resp[hostname]
+            elif resp[hostname]:
+                return True, description
+        return False, description

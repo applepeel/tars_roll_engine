@@ -131,7 +131,7 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
     def get_resume_handler(self):
         handler_map = {_.ROLLOUT_BRAKED: self.rollout}
 
-        return handler_map.get(self.status, self.trans)
+        return handler_map.get(self.status)
 
     def get_revoke_batches(self):
         current_status = self.status
@@ -180,7 +180,7 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
                        _.BAKE_BRAKED: self.bake,
                        _.ROLLOUT_BRAKED: self.rollout}
 
-        return handler_map.get(self.status, self.trans)
+        return handler_map.get(self.status)
 
     def get_revoke_batches(self):
         current_status = self.status

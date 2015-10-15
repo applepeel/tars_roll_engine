@@ -158,7 +158,10 @@ class BrakeMixin(object):
         re_logger.info('Deployment resumed', extra=extra)
         action = '{}_resume'.format(self.status.lower())
         handler = self.get_resume_handler()
-        handler(action, operator=operator)
+        if handler is not None:
+            handler(action, operator=operator)
+        else:
+            self.trans(action)
 
 
 class RevokeMixin(object):

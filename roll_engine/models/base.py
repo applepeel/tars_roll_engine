@@ -41,7 +41,7 @@ class FSMedModel(TimestampedModel):
             raise StatusError('{} has been revoked.'.format(self))
         self.save(update_fields=['status', 'updated_at'])
 
-    def trans(self, action=None):
+    def trans(self, action=None, **kwargs):
         old_status = self.status = self.fetch_status()
         getattr(self, action.lower())()
         self.update_status(force=False)

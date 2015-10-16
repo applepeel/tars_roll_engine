@@ -145,12 +145,10 @@ class BrakeMixin(object):
         extra = {'deploy': self}
         re_logger.info('Deployment braked', extra=extra)
 
+        self.revoke(update_status=False)
+
         action = '{}_brake'.format(status)
         self.trans(action)
-
-        # brake_method raise Terminated error in some case, call it at the end
-        # is a workaround to guarantee of brake-status transition
-        self.revoke(update_status=False)
 
     @log_action(msg='resume deployment')
     def resume(self, operator=None):
@@ -209,8 +207,8 @@ class BatchMixin(object):
         return canvas
 
     def revoke(self, update_status=True):
-        for task_id in self.targets.all().values_list('task_id', flat=True):
-            _revoke_chain(task_id, True)
+        for tgt in self.targets.all():
+            tgt.revoke()
         if update_status:
             self.trans(_.REVOKED)
 

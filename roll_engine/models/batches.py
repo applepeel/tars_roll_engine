@@ -12,6 +12,7 @@ class DeploymentBatch(BatchMixin, BatchFSMixin, FSMedModel):
     __metaclass__ = InheritanceMetaclass
 
     index = models.IntegerField(null=True)
+    pause_time = models.IntegerField(default=0)
     FORT_INDEX = 1
 
     class Meta:
@@ -26,3 +27,9 @@ class DeploymentBatch(BatchMixin, BatchFSMixin, FSMedModel):
 
     def is_fort_batch(self):
         raise DeploymentError('return boolean to indicate whether a fort batch')
+
+    def save(self, *args, **kwargs):
+        if self.pk is None:
+            if self.deployment is not None:
+                self.pause_time = self.deployment.config.pause_time
+        super(DeploymentBatch, self).save(*args, **kwargs)

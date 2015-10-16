@@ -67,14 +67,12 @@ class SmokeMixin(object):
         fort_batch = self.get_fort_batch()
         target_canvases = [tgt.create_smoke_canvas(operator)
                            for tgt in fort_batch.targets.all()]
-        pause_time = fort_batch.pause_time
         smoke_success_status = self._meta.smoke_success_status
 
         canvas = chain(
             tasks.start_smoking.si(tasks, deployment_id, operator),
             tasks.start_rolling_batch.subtask(args=(tasks, deployment_id,
                                                     fort_batch.id, operator),
-                                              countdown=pause_time,
                                               immutable=True),
             chord(target_canvases,
                   tasks.finish_smoking.si(tasks, deployment_id,

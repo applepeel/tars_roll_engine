@@ -33,3 +33,6 @@ class DeploymentBatch(BatchMixin, BatchFSMixin, FSMedModel):
             if self.deployment is not None:
                 self.pause_time = self.deployment.config.pause_time
         super(DeploymentBatch, self).save(*args, **kwargs)
+
+    def is_reach_up_server_threshold(self):
+        return False

@@ -47,7 +47,7 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
         return {'deploy': self}
 
     def _create_batch_and_target(self):
-        servers = self.servers_to_be_deployed().values()
+        servers = self.servers_to_be_deployed()
         self._meta.batch_factory.generate_deployment_batches(self, servers)
 
     def servers_to_be_deployed(self):
@@ -191,7 +191,7 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
         return batches
 
     def _create_batch_and_target(self):
-        servers = self.servers_to_be_deployed().values()
+        servers = self.servers_to_be_deployed()
         forts = self.get_forts().values_list('hostname', flat=True)
         self._meta.batch_factory.generate_deployment_batches(self, servers,
                                                              forts)

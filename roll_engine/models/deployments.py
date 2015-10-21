@@ -55,16 +55,13 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
                               'server instances for deploying')
 
     def build_deployment_log(self, deployment_target=None, operator=None):
-        if operator is None:
-            operator = ('', '')
-
         log = {}
         log['deploy_id'] = self.id
         log['deploy_status'] = self.status
         log['deploy_target'] = getattr(deployment_target, 'id', -1)
         log['deploy_target_status'] = getattr(deployment_target, 'status', '')
         log['deploy_target_name'] = getattr(deployment_target, 'hostname', '')
-        log['mail'] = operator[-1]
+        log['mail'] = getattr(operator, 'email', '')
         return log
 
     def log_callback(self, log):

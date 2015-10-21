@@ -22,10 +22,10 @@ def log_action(msg=''):
         @wraps(func)
         def func_wrapper(deployment, *args, **kwargs):
             operator = kwargs.get('operator', AnonymousUser())
-            kwargs['operator'] = tuple(getattr(operator, attr, '')
-                                       for attr in ('username', 'email'))
-            deployment.actions.create(action=func.__name__, message=msg,
-                                      operator=kwargs['operator'][0])
+            deployment.actions.create(
+                action=func.__name__, message=msg,
+                operator=getattr(operator, 'username', ''))
+            kwargs['operator'] = operator
             func(deployment, *args, **kwargs)
         return func_wrapper
     return decorator

@@ -27,7 +27,8 @@ class RollEngineFormatter(logging.Formatter):
 
         deploy = record.deploy
         tgt = getattr(record, 'tgt', None)
-        log.update(deploy.build_deployment_log(tgt))
+        operator = getattr(record, 'operator', None)
+        log.update(deploy.build_deployment_log(tgt, operator=operator))
         return log
 
 

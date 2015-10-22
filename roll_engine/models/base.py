@@ -47,7 +47,7 @@ class FSMedModel(TimestampedModel):
         self.update_status(force=False)
         re_logger.info('%r changed from %s to %s' % (self, old_status,
                                                      self.status),
-                       extra=self.get_extra())
+                       extra=self.get_extras())
 
     def next_user_actions(self):
         return [(ts.custom.get('alias') or ts.name)
@@ -64,5 +64,5 @@ class FSMedModel(TimestampedModel):
         else:
             return False
 
-    def get_extra(self):
+    def get_extras(self):
         return {}

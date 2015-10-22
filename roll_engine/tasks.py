@@ -117,12 +117,15 @@ class Tasks(object):
     @on_error
     def finish_deployment(cls, deploy_id, operator=None):
         deploy = cls._retrieve_models(deployment_id=deploy_id).deployment
+        extra = {'deploy': deploy, 'operator': operator}
         idle_batches = deploy.batches.filter(status=constants.PENDING)
         if not idle_batches.exists():
             if deploy.status == constants.ROLLOUT_FAILURE:
                 deploy.safe_trans(constants.FAILURE)
+                re_logger.info('Deployment failed', extra=extra)
             elif deploy.status == constants.ROLLOUT_SUCCESS:
                 deploy.safe_trans(constants.SUCCESS)
+                re_logger.info('Deployment succeeded', extra=extra)
 
     @classmethod
     @shared_task(ignore_result=True)

@@ -140,7 +140,7 @@ class BrakeMixin(object):
     def brake(self, operator=None):
         status = self.status.lower()
 
-        extra = {'deploy': self}
+        extra = {'deploy': self, 'operator': operator}
         re_logger.info('Deployment braked', extra=extra)
 
         self.revoke(update_status=False)
@@ -167,7 +167,7 @@ class RevokeMixin(object):
         for batch in batches:
             batch.revoke(update_status)
 
-        extra = {'deploy': self}
+        extra = {'deploy': self, 'operator': operator}
         re_logger.info('Deployment revoked', extra=extra)
 
         if update_status:

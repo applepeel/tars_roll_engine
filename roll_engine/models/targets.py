@@ -44,13 +44,18 @@ class DeploymentTarget(TargetMixin, FSMedModel):
         raise DeploymentError('override pull_in to implement enable in LB, '
                               'return boolean to indicate result')
 
-    def call_salt(self, cmd, *args, **kwargs):
+    def call_salt(self, module_func, *args, **kwargs):
+        log = kwargs.pop('log', True)
+
         hostname = self.hostname
         deployment = self.batch.deployment
         salt_client, salt_module = deployment.salt_client_and_module()
-        module_func = '{module}.{cmd}'.format(module=salt_module, cmd=cmd)
-        log_extra = deployment.build_deployment_log(self)
-        kwargs.update({'log_extra': log_extra})
+        if '.' not in module_func:
+            module_func = '{module}.{cmd}'.format(module=salt_module,
+                                                  cmd=module_func)
+        if log:
+            log_extra = deployment.build_deployment_log(self)
+            kwargs.update({'log_extra': log_extra})
         kwargs.setdefault('wait_timeout', self._meta.salt_timeout)
 
         try:

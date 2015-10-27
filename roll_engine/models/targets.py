@@ -48,11 +48,9 @@ class DeploymentTarget(TargetMixin, FSMedModel):
         hostname = self.hostname
         deployment = self.batch.deployment
         salt_client, salt_module = deployment.salt_client_and_module()
-        module_func = (kwargs.pop('module_func', None) or
-                       '{module}.{cmd}'.format(module=salt_module, cmd=cmd))
-        if kwargs.pop('log', None):
-            log_extra = deployment.build_deployment_log(self)
-            kwargs.update({'log_extra': log_extra})
+        module_func = '{module}.{cmd}'.format(module=salt_module, cmd=cmd)
+        log_extra = deployment.build_deployment_log(self)
+        kwargs.update({'log_extra': log_extra})
         kwargs.setdefault('wait_timeout', self._meta.salt_timeout)
 
         try:

@@ -29,8 +29,7 @@ class BatchFactory(object):
         slice_counts = []
 
         while rest_count > 0:
-            percentage = (self.max_percentage
-                          if not percentages else percentages.pop(0))
+            percentage = (25 if not percentages else percentages.pop(0))
             count = min(int(percentage*servers_count / 100.0), rest_count) or 1
             slice_counts.append(count)
             rest_count -= count

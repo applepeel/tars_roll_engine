@@ -1,3 +1,9 @@
+"""
+Target FSM should have various states depends on the real situation,thus we only define
+disabling related states. Most importantly, we don't and you NEED TO define a success
+transition in your child FSM. Because batch/deployment finish_rolling tasks
+rely on target SUCCESS status
+"""
 from __future__ import absolute_import
 
 from roll_engine import constants as _

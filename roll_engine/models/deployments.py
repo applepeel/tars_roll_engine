@@ -71,6 +71,11 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
         if self.pk is None:
             super(Deployment, self).save(*args, **kwargs)
             self._create_batch_and_target()
+            # convert batch_pattern to full format
+            self.config.batch_pattern = self._meta.batch_factory\
+                .validate_batch_pattern(self.config.batch_pattern)
+            self.config.save()
+
         else:
             super(Deployment, self).save(*args, **kwargs)
 

@@ -16,6 +16,7 @@ class DeploymentTarget(TargetMixin, FSMedModel):
     task_id = models.CharField(max_length=36, null=True, blank=True)
     is_fort = models.BooleanField(default=False)
     hostname = models.CharField(max_length=100, null=True, blank=True)
+    ip_address = models.CharField(max_length=64, null=True, blank=True)
 
     class Meta:
         abstract = True

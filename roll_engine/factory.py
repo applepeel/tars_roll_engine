@@ -96,6 +96,7 @@ class BatchFactory(object):
         if deployment_batch.is_fort_batch():
             kwargs.update(is_fort=True)
         target_model = deployment_batch.targets.model
-        target_model.objects.bulk_create(target_model(hostname=svr['hostname'],
-                                                      **kwargs)
-                                         for svr in batch_servers)
+        target_model.objects.bulk_create(
+            target_model(hostname=svr['hostname'], ip_address=svr['ip_address'],
+                         **kwargs)
+            for svr in batch_servers)

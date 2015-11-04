@@ -148,6 +148,8 @@ class Tasks(object):
         deploy.safe_trans(constants.ROLLOUT_FAILURE
                           if nonsuccess_batches.exists()
                           else constants.ROLLOUT_SUCCESS)
+        re_logger.info('Rollout finished',
+                       extra={'deploy': deploy, 'operator': operator})
 
     @classmethod
     @shared_task

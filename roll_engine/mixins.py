@@ -22,8 +22,10 @@ def log_action(msg=''):
         @wraps(func)
         def func_wrapper(deployment, *args, **kwargs):
             operator = kwargs.get('operator', AnonymousUser())
+            is_retry = kwargs.get('is_retry', False)
+            message = '{} for retry'.format(msg) if is_retry else msg
             deployment.actions.create(
-                action=func.__name__, message=msg,
+                action=func.__name__, message=message,
                 operator=getattr(operator, 'username', ''))
             kwargs['operator'] = operator
             func(deployment, *args, **kwargs)
@@ -81,7 +83,7 @@ class SmokeMixin(object):
         return canvas
 
     @log_action(msg='start smoking')
-    def smoke(self, action=_.SMOKING, operator=None):
+    def smoke(self, action=_.SMOKING, operator=None, is_retry=False):
         canvas = self.__create_canvas(operator)
         canvas.delay()
         self.trans(action)
@@ -104,21 +106,24 @@ class BakeMixin(object):
         return canvas
 
     @log_action(msg='start baking')
-    def bake(self, action=_.BAKING, operator=None):
+    def bake(self, action=_.BAKING, operator=None, is_retry=False):
         canvas = self.__create_canvas(operator)
         canvas.delay()
         self.trans(action)
 
 
 class RolloutMixin(object):
-    def __create_canvas(self, operator=None):
+    def __create_canvas(self, operator=None, is_retry=False):
         deployment_id = self.id
         tasks = self._meta.task_set
 
         batches = self.get_rollout_batches()
+        if is_retry:
+            # only retry non-successfull deployment batches
+            batches = batches.exclude(status=_.SUCCESS)
+
         batch_ids = batches.values_list('id', flat=True)
-        batch_canvases = [batch.create_canvas(operator)
-                          for batch in batches]
+        batch_canvases = [batch.create_canvas(operator) for batch in batches]
         ts = [tasks.start_rolling_out.si(tasks, deployment_id, operator)]
         ts.extend(batch_canvases)
         ts.append(tasks.finish_rolling_out.si(tasks, deployment_id, batch_ids,
@@ -129,9 +134,9 @@ class RolloutMixin(object):
         return canvas
 
     @log_action(msg='start rolling out')
-    def rollout(self, action=_.ROLLING_OUT, operator=None):
+    def rollout(self, action=_.ROLLING_OUT, operator=None, is_retry=False):
         self.trans(action)  # switch status before rolling
-        canvas = self.__create_canvas(operator)
+        canvas = self.__create_canvas(operator, is_retry)
         canvas.delay()
 
 
@@ -181,7 +186,7 @@ class RetryMixin(object):
         re_logger.info('Retry deployment', extra=extra)
         handler = self.get_retry_handler()
         action = '{}_retry'.format(handler.__name__)
-        handler(action, operator=operator)
+        handler(action, operator=operator, is_retry=True)
 
 
 class BatchMixin(object):

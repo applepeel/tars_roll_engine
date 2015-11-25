@@ -17,5 +17,5 @@ Quick start
 2. Run `python manage.py celery -A roll_engine worker -l info` to start worker service.
    Or export `DJANGO_SETTINGS_MODULE` environment before you run `celery -A roll_engine worker -i info`::
 
-   # e.g. in tars django project
-   export DJANGO_SETTINGS_MODULE='tars.settings'
+    # e.g. in tars django project
+    export DJANGO_SETTINGS_MODULE='tars.settings'

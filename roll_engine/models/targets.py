@@ -71,6 +71,9 @@ class DeploymentTarget(TargetMixin, FSMedModel):
         except Exception as e:
             resp = {}
             description = 'salt error: {}'.format(e)
+            arguments = "module_func: {}, args: {}, kwargs: {}".format(
+                module_func, args, kwargs)
+            re_logger.error('{} with : [{}]'.format(description, arguments))
         description = description or 'view agent log for detail'
 
         if hostname in resp:

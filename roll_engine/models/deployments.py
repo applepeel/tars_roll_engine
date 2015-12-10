@@ -30,7 +30,7 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
     def validate_meta(cls):
         cls._meta.__class__ = RollEngineOptions
         for name in ('batch_factory', 'task_set'):
-            if getattr(cls._meta, name) is None:
+            if not hasattr(cls._meta, name):
                 raise MetaMissing('missing {} in Meta of {} Model'
                                   .format(name, cls.__name__))
 
@@ -153,7 +153,7 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
     @classmethod
     def validate_meta(cls):
         cls._meta.__class__ = RollEngineOptions
-        if getattr(cls._meta, 'smoke_success_status') is None:
+        if not hasattr(cls._meta, 'smoke_success_status'):
             raise MetaMissing('missing smoke_success_status in Meta of {}'
                               ' Model'.format(cls.__name__))
         super(FortFSMixin, cls).validate_meta()

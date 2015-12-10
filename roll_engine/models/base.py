@@ -1,6 +1,7 @@
 from __future__ import absolute_import
 
 from django.db.models.base import ModelBase
+from django.db.models.options import Options
 
 from django_fsm import can_proceed, FSMField
 
@@ -13,10 +14,29 @@ from roll_engine.utils.log import get_logger
 re_logger = get_logger()
 
 
+class RollEngineOptions(Options):
+    @property
+    def __parent_model(self):
+        if self.proxy:
+            return self.proxy_for_model
+        else:
+            for parent, _ in self.parents.items():
+                return parent
+        return None
+
+    def __getattr__(self, attr):
+        if attr in ('batch_factory', 'task_set', 'smoke_success_status'):
+            parent = self.__parent_model
+            if parent is not None:
+                return getattr(parent._meta, attr)
+        raise AttributeError
+
+
 class InheritanceMetaclass(ModelBase):
     def __new__(cls, name, bases, attr):
         klass = ModelBase.__new__(cls, name, bases, attr)
         klass.validate_meta()
+        klass._meta.__class__ = RollEngineOptions
         return klass
 
     def __call__(cls, *args, **kwargs):

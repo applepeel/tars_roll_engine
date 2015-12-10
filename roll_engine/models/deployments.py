@@ -11,7 +11,7 @@ from roll_engine.mixins import (StartMixin, RolloutMixin, SmokeMixin, BakeMixin,
 from roll_engine.factory import BatchFactory
 from roll_engine.tasks import Tasks
 
-from .base import FSMedModel, InheritanceMetaclass
+from .base import FSMedModel, InheritanceMetaclass, RollEngineOptions
 
 celery_logger = get_task_logger(__name__)
 
@@ -28,11 +28,11 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
 
     @classmethod
     def validate_meta(cls):
-        return
-        for meta in ['batch_factory', 'task_set']:
-            if meta not in dir(cls._meta):
-                raise MetaMissing('missing {} in Meta of {} Model'.
-                                  format(meta, cls.__name__))
+        cls._meta.__class__ = RollEngineOptions
+        for name in ('batch_factory', 'task_set'):
+            if getattr(cls._meta, name) is None:
+                raise MetaMissing('missing {} in Meta of {} Model'
+                                  .format(name, cls.__name__))
 
     def get_object(self):
         return self
@@ -152,7 +152,8 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
 class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
     @classmethod
     def validate_meta(cls):
-        if 'smoke_success_status' not in dir(cls._meta):
+        cls._meta.__class__ = RollEngineOptions
+        if getattr(cls._meta, 'smoke_success_status') is None:
             raise MetaMissing('missing smoke_success_status in Meta of {}'
                               ' Model'.format(cls.__name__))
         super(FortFSMixin, cls).validate_meta()

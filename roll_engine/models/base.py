@@ -25,7 +25,8 @@ class RollEngineOptions(Options):
         return None
 
     def __getattr__(self, attr):
-        if attr in ('batch_factory', 'task_set', 'smoke_success_status'):
+        if attr in ('batch_factory', 'task_set', 'smoke_success_status',
+                    'salt_timeout'):
             parent = self.__parent_model
             if parent is not None:
                 return getattr(parent._meta, attr)

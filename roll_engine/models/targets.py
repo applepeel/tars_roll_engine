@@ -4,7 +4,7 @@ from roll_engine.exceptions import MetaMissing, DeploymentError
 from roll_engine.utils.log import get_logger
 from roll_engine.mixins import TargetMixin
 
-from .base import FSMedModel, InheritanceMetaclass
+from .base import FSMedModel, InheritanceMetaclass, RollEngineOptions
 
 
 re_logger = get_logger()
@@ -26,7 +26,8 @@ class DeploymentTarget(TargetMixin, FSMedModel):
 
     @classmethod
     def validate_meta(cls):
-        if 'salt_timeout' not in dir(cls._meta):
+        cls._meta.__class__ = RollEngineOptions
+        if not hasattr(cls._meta, 'salt_timeout'):
             raise MetaMissing('missing salt_timeout in Meta of {} Model'.
                               format(cls.__name__))
 

@@ -15,8 +15,10 @@ class DeploymentTarget(TargetMixin, FSMedModel):
 
     task_id = models.CharField(max_length=36, null=True, blank=True)
     is_fort = models.BooleanField(default=False)
-    hostname = models.CharField(max_length=100, null=True, blank=True)
-    ip_address = models.CharField(max_length=64, null=True, blank=True)
+    _hostname = models.CharField(
+        max_length=100, null=True, blank=True, db_column='hostname')
+    _ip_address = models.CharField(
+        max_length=64, null=True, blank=True, db_column='ip_address')
 
     class Meta:
         abstract = True
@@ -27,6 +29,26 @@ class DeploymentTarget(TargetMixin, FSMedModel):
         if 'salt_timeout' not in dir(cls._meta):
             raise MetaMissing('missing salt_timeout in Meta of {} Model'.
                               format(cls.__name__))
+
+    @property
+    def hostname(self):
+        return self._hostname
+
+    @hostname.setter
+    def hostname(self, value):
+        self._hostname = value
+
+    @property
+    def ip_address(self):
+        return self._ip_address
+
+    @ip_address.setter
+    def ip_address(self, value):
+        self._ip_address = value
+
+    @ip_address.deleter
+    def ip_address(self):
+        del self._ip_address
 
     def get_object(self):
         return self

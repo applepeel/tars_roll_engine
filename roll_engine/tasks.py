@@ -199,8 +199,8 @@ class Tasks(object):
             re_logger.error('Pull in target fail', extra=extra)
 
     @classmethod
-    def roll_job(cls):
-        raise JobMissing('missing roll_job definition in Task Set {}'.
+    def rollout_job(cls):
+        raise JobMissing('missing rollout_job definition in Task Set {}'.
                          format(cls.__name__))
 
     @classmethod

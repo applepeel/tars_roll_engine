@@ -90,24 +90,31 @@ class SmokeMixin(object):
 
 
 class BakeMixin(object):
-    def __create_canvas(self, operator=None):
+    def __create_canvas(self, operator=None, is_retry=False):
         deployment_id = self.id
         tasks = self._meta.task_set
         fort_batch = self.get_fort_batch()
         target_canvases = [tgt.create_bake_canvas(operator)
                            for tgt in fort_batch.targets.all()]
-
-        canvas = chain(
+        ts = [
             tasks.start_baking.si(tasks, deployment_id, operator),
             chord(target_canvases, tasks.finish_rolling_batch.si(
                 tasks, deployment_id, fort_batch.id, operator)),
             tasks.finish_baking.si(tasks, deployment_id, operator)
-        )
+        ]
+
+        if is_retry:
+            restart_rolling_batch = tasks.start_rolling_batch.subtask(
+                args=(tasks, deployment_id, fort_batch.id, operator),
+                immutable=True)
+            ts.insert(1, restart_rolling_batch)
+
+        canvas = chain(*ts)
         return canvas
 
     @log_action(msg='start baking')
     def bake(self, action=_.BAKING, operator=None, is_retry=False):
-        canvas = self.__create_canvas(operator)
+        canvas = self.__create_canvas(operator, is_retry)
         canvas.delay()
         self.trans(action)
 

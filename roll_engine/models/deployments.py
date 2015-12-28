@@ -48,7 +48,10 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
 
     def _create_batch_and_target(self):
         servers = self.servers_to_be_deployed()
-        self._meta.batch_factory.generate_deployment_batches(self, servers)
+        if servers:
+            self._meta.batch_factory.generate_deployment_batches(self, servers)
+        else:
+            raise DeploymentError('no server to be deployed')
 
     def servers_to_be_deployed(self):
         raise DeploymentError('override servers_to_be_deployed to return '
@@ -198,5 +201,8 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
 
     def _create_batch_and_target(self):
         servers = self.servers_to_be_deployed()
-        self._meta.batch_factory.generate_deployment_batches(
-            self, servers, self.get_forts())
+        if servers:
+            self._meta.batch_factory.generate_deployment_batches(
+                self, servers, self.get_forts())
+        else:
+            raise DeploymentError('no server to be deployed')

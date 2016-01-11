@@ -53,6 +53,10 @@ class FSMedModel(TimestampedModel):
     class Meta:
         abstract = True
 
+    @property
+    def extras(self):
+        return {}
+
     def fetch_status(self):
         obj = self.__class__.objects.get(id=self.id)
         return obj.status
@@ -68,7 +72,7 @@ class FSMedModel(TimestampedModel):
         self.update_status(force=False)
         re_logger.info('%r changed from %s to %s' % (self, old_status,
                                                      self.status),
-                       extra=self.get_extras())
+                       extra=self.extras)
 
     def next_user_actions(self):
         return [(ts.custom.get('alias') or ts.name)
@@ -86,4 +90,5 @@ class FSMedModel(TimestampedModel):
             return False
 
     def get_extras(self):
+        """ would be deprecated soon """
         return {}

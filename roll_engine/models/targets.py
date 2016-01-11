@@ -32,6 +32,10 @@ class DeploymentTarget(TargetMixin, FSMedModel):
                               format(cls.__name__))
 
     @property
+    def extras(self):
+        return {'deploy': self.batch.deployment, 'tgt': self}
+
+    @property
     def hostname(self):
         return self._hostname
 
@@ -58,6 +62,7 @@ class DeploymentTarget(TargetMixin, FSMedModel):
         return self.hostname
 
     def get_extras(self):
+        """ would be deprecated soon """
         return {'deploy': self.batch.deployment, 'tgt': self}
 
     def pull_out(self):

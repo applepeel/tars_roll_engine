@@ -22,7 +22,7 @@ class BatchFSMixin(object):
             deploy = self.deployment
             if not deploy.is_braked():
                 re_logger.error('Braked for upped servers below minimum '
-                                'threshold', extra=deploy.get_extras())
+                                'threshold', extra=deploy.extras)
                 deploy.brake()
         return not is_reached
 

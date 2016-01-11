@@ -43,7 +43,12 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
     def __unicode__(self):
         return unicode(self.id)
 
+    @property
+    def extras(self):
+        return {'deploy': self}
+
     def get_extras(self):
+        """ would be deprecated soon """
         return {'deploy': self}
 
     def _create_batch_and_target(self):

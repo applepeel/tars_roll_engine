@@ -21,8 +21,9 @@ def on_error(func):
     def error_wrapper(*args, **kwargs):
         try:
             func(*args, **kwargs)
-        except Exception:
-            celery_logger.exception('calling "{}" error'.format(func.__name__))
+        except Exception as e:
+            celery_logger.exception(
+                'calling "{}" error: {}'.format(func.__name__, e))
     return error_wrapper
 
 

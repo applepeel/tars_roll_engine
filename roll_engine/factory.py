@@ -14,6 +14,7 @@ class BatchFactory(object):
         self.delimiter = delimiter
 
     def _parse_batch_pattern(self, batch_pattern):
+        batch_pattern = self.validate_batch_pattern(batch_pattern)
         raw_percents = batch_pattern.split(self.delimiter)
         return [int(p.strip('%')) for p in raw_percents]
 
@@ -43,14 +44,13 @@ class BatchFactory(object):
             sliced_servers.insert(0, fort_servers)
         return sliced_servers
 
-    def validate_batch_pattern(self, pattern_str):
+    def validate_batch_pattern(self, pattern_str, max_percentage=None):
+        if max_percentage is None:
+            max_percentage = self.max_percentage
         try:
             if re.match(r'^\d+%$', pattern_str):
                 percentage = int(pattern_str.strip('%'))
-                if not 0 < percentage <= self.max_percentage:
-                    raise BatchPatternError(
-                        'percentage should be a value located in (0, {}]%'
-                        .format(self.max_percentage))
+                assert 0 < percentage <= max_percentage
                 percentages = [percentage for _ in range(100/percentage)]
                 if 100 % percentage:
                     percentages.append(100 % percentage)
@@ -64,11 +64,17 @@ class BatchFactory(object):
                     prog = re.compile(r'(\d+)%')
                     percentages = re.findall(prog, pattern_str)
                     percentages = [int(i) for i in percentages]
+                    for p in percentages:
+                        assert 0 < p <= max_percentage
                     if 100 != int(sum(percentages)):
                         raise BatchPatternError(
                             'sum of percentages is not equal to 100%')
                 else:
                     raise BatchPatternError('illegal pattern')
+        except AssertionError:
+            raise BatchPatternError(
+                'percentage should be a value located in (0, {}]%'
+                .format(max_percentage))
         except (ValueError, BatchPatternError) as e:
             raise BatchPatternError(e)
         return self.delimiter.join(['{}%'.format(p) for p in percentages])

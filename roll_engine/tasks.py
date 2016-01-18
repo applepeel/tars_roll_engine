@@ -144,7 +144,7 @@ class Tasks(object):
             batch_ids = []
         deploy = cls._retrieve_models(deployment_id=deploy_id).deployment
 
-        nonsuccess_batches = deploy.batches.filter(pk__in=batch_ids)\
+        nonsuccess_batches = deploy.batches.filter(pk__in=list(batch_ids))\
             .exclude(status=constants.SUCCESS)
         deploy.safe_trans(constants.ROLLOUT_FAILURE
                           if nonsuccess_batches.exists()

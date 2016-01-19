@@ -90,7 +90,12 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
     def get_rollout_batches(self):
         queryset = self.batches.order_by('index').all()
         if self.config.mode == self.config.MANUAL:
-            queryset = queryset.filter(status=_.PENDING)[:1]
+            pending_batches = queryset.filter(status=_.PENDING)
+            if pending_batches.exists():
+                first_pending_batch = pending_batches.first()
+                queryset = pending_batches.filter(id=first_pending_batch.id)
+            else:
+                queryset = self.batches.none()
         return queryset
 
     def is_running(self):
@@ -149,7 +154,7 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
         if current_status == _.ROLLING_OUT:
             batches = self.get_rollout_batches()
         else:
-            batches = []
+            batches = self.batches.none()
         return batches
 
     def salt_client_and_module(self):
@@ -176,7 +181,12 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
     def get_rollout_batches(self):
         queryset = self.batches.order_by('index').exclude(index=1)
         if self.config.mode == self.config.MANUAL:
-            queryset = queryset.filter(status=_.PENDING)[:1]
+            pending_batches = queryset.filter(status=_.PENDING)
+            if pending_batches.exists():
+                first_pending_batch = pending_batches.first()
+                queryset = pending_batches.filter(id=first_pending_batch.id)
+            else:
+                queryset = self.batches.none()
         return queryset
 
     def get_retry_handler(self):
@@ -197,11 +207,12 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
         current_status = self.status
 
         if current_status in [_.BAKING, _.SMOKING]:
-            batches = [self.get_fort_batch()]
+            fort_batch = self.get_fort_batch()
+            batches = self.batches.filter(id=fort_batch.id)
         elif current_status == _.ROLLING_OUT:
             batches = self.get_rollout_batches()
         else:
-            batches = []
+            batches = self.batches.none()
         return batches
 
     def _create_batch_and_target(self):

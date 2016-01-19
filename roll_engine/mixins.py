@@ -129,7 +129,7 @@ class RolloutMixin(object):
             # only retry non-successfull deployment batches
             batches = batches.exclude(status=_.SUCCESS)
 
-        batch_ids = batches.values_list('id', flat=True)
+        batch_ids = list(batches.values_list('id', flat=True))  # evaluate out
         batch_canvases = [batch.create_canvas(operator) for batch in batches]
         ts = [tasks.start_rolling_out.si(tasks, deployment_id, operator)]
         ts.extend(batch_canvases)

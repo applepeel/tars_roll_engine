@@ -161,9 +161,7 @@ class Tasks(object):
         extra = {'deploy': deploy, 'tgt': tgt, 'operator': operator}
 
         if not tgt.safe_trans(constants.DISABLING):
-            # cannot be violating server-up policy when server is skipped
-            # skipped == PENDING -> SUCCESS
-            if tgt.status != constants.SUCCESS:
+            if not tgt.can_disabling():
                 re_logger.error('Pull out is stopped, may be caused by upped '
                                 'server count checking', extra=extra)
             return

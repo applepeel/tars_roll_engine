@@ -200,9 +200,15 @@ class BatchMixin(object):
     def create_canvas(self, operator=None):
         batch_id = self.id
         deployment_id = self.deployment_id
-        tasks = self.deployment._meta.task_set
-        pause_time = self.pause_time
         targets = self.targets.all()
+        deployment = self.deployment
+        tasks = deployment._meta.task_set
+        first_rollout_batch = deployment.get_rollout_batches().first()
+
+        if self == first_rollout_batch:
+            pause_time = 0
+        else:
+            pause_time = self.pause_time
 
         target_canvases = [t.create_rollout_canvas(operator) for t in targets]
         canvas = chain(

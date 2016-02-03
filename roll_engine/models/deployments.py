@@ -174,7 +174,7 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
     def get_fort_batch(self):
         return self.batches.order_by('index').first()
 
-    def get_forts(self):
+    def get_forts(self, valid_servers=None):
         raise DeploymentError(
             "override get_forts to return list of fort servers' hostname")
 
@@ -217,8 +217,9 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
 
     def _create_batch_and_target(self):
         servers = self.servers_to_be_deployed()
+        svr_hostnames = [svr['hostname'] for svr in servers]
         if servers:
             self._meta.batch_factory.generate_deployment_batches(
-                self, servers, self.get_forts())
+                self, servers, self.get_forts(valid_servers=svr_hostnames))
         else:
             raise DeploymentError('no server to be deployed')

@@ -75,6 +75,7 @@ class DeploymentTarget(TargetMixin, FSMedModel):
 
     def call_salt(self, module_func, *args, **kwargs):
         log = kwargs.pop('log', True)
+        ping = kwargs.pop('ping', True)
 
         hostname = self.hostname
         deployment = self.batch.deployment
@@ -88,16 +89,16 @@ class DeploymentTarget(TargetMixin, FSMedModel):
         kwargs.setdefault('wait_timeout', self._meta.salt_timeout)
 
         try:
-            # always ping salt minion before run job
-            ping_result_tuple = salt_client.run_module_await(
-                hostname,
-                'test.ping',
-                wait_timeout=15
-            )
+            if ping:
+                ping_result_tuple = salt_client.run_module_await(
+                    hostname,
+                    'test.ping',
+                    wait_timeout=15
+                )
 
-            if not ping_result_tuple[0].get(hostname, False):
-                raise Exception(
-                    'salt minion {} is not available'.format(hostname))
+                if not ping_result_tuple[0].get(hostname, False):
+                    raise Exception(
+                        'salt minion {} is not available'.format(hostname))
 
             resp, description = salt_client.run_module_await(
                 hostname, module_func, *args, **kwargs)

@@ -112,7 +112,10 @@ class DeploymentTarget(TargetMixin, FSMedModel):
 
         if hostname in resp:
             if isinstance(resp[hostname], basestring):
-                return True, resp[hostname]
+                if 'exception' in resp[hostname] and 'Traceback' in resp[hostname]:
+                    description = resp[hostname]
+                else:
+                    return True, resp[hostname]
             elif resp[hostname]:
                 return True, description
         return False, description

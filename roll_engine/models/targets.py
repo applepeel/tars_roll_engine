@@ -97,8 +97,8 @@ class DeploymentTarget(TargetMixin, FSMedModel):
                 )
 
                 if not ping_result_tuple[0].get(hostname, False):
-                    raise Exception(
-                        'salt minion {} is not available'.format(hostname))
+                    raise Exception('salt minion {} is not available: {}'
+                                    .format(hostname, ping_result_tuple[1]))
 
             resp, description = salt_client.run_module_await(
                 hostname, module_func, *args, **kwargs)

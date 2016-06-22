@@ -211,16 +211,24 @@ class BatchMixin(object):
             pause_time = self.pause_time
 
         target_canvases = [t.create_rollout_canvas(operator) for t in targets]
-        canvas = chain(
-            tasks.start_rolling_batch.subtask(args=(tasks, deployment_id,
-                                                    batch_id, operator),
-                                              countdown=pause_time,
-                                              immutable=True),
-            chord(target_canvases,
-                  tasks.finish_rolling_batch.si(tasks, deployment_id, batch_id,
-                                                operator))
-        )
-        return canvas
+        chain_args = [
+            tasks.start_rolling_batch.subtask(
+                args=(tasks, deployment_id, batch_id, operator),
+                countdown=pause_time, immutable=True)
+        ]
+        if target_canvases:
+            chain_args.append(
+                chord(target_canvases, tasks.finish_rolling_batch.si(
+                    tasks, deployment_id, batch_id, operator)
+                )
+            )
+        else:
+            # empty batch is ok
+            chain_args.append(
+                tasks.finish_rolling_batch.si(
+                    tasks, deployment_id, batch_id, operator)
+            )
+        return chain(*chain_args)
 
     def revoke(self, update_status=True):
         for tgt in self.targets.all():

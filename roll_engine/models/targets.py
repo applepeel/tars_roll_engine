@@ -91,7 +91,7 @@ class DeploymentTarget(TargetMixin, FSMedModel):
         try:
             if ping:
                 ping_result_tuple = salt_client.run_module_await(
-                    hostname,
+                    [hostname],
                     'test.ping',
                     wait_timeout=15
                 )
@@ -101,7 +101,7 @@ class DeploymentTarget(TargetMixin, FSMedModel):
                                     .format(hostname, ping_result_tuple[1]))
 
             resp, description = salt_client.run_module_await(
-                hostname, module_func, *args, **kwargs)
+                [hostname], module_func, *args, **kwargs)
         except Exception as e:
             resp = {}
             description = 'salt error: {}'.format(e)

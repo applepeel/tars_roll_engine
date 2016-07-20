@@ -88,9 +88,9 @@ class Deployment(StartMixin, RolloutMixin, BrakeMixin, RevokeMixin,
             super(Deployment, self).save(*args, **kwargs)
 
     def get_rollout_batches(self):
-        queryset = self.batches.order_by('index').all()
+        queryset = self.batches.order_by('index')
         if self.config.mode == self.config.MANUAL:
-            pending_batches = queryset.filter(status=_.PENDING)
+            pending_batches = queryset.exclude(status=_.SUCCESS)
             if pending_batches.exists():
                 first_pending_batch = pending_batches.first()
                 queryset = pending_batches.filter(id=first_pending_batch.id)
@@ -181,7 +181,7 @@ class FortMixin(SmokeMixin, BakeMixin, FortFSMixin):
     def get_rollout_batches(self):
         queryset = self.batches.order_by('index').exclude(index=1)
         if self.config.mode == self.config.MANUAL:
-            pending_batches = queryset.filter(status=_.PENDING)
+            pending_batches = queryset.exclude(status=_.SUCCESS)
             if pending_batches.exists():
                 first_pending_batch = pending_batches.first()
                 queryset = pending_batches.filter(id=first_pending_batch.id)

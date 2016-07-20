@@ -10,7 +10,7 @@ class DeploymentConfig(TimestampedModel):
         (MANUAL, 'manual'),
         (AUTO, 'auto')
     )
-    batch_pattern = models.CharField(max_length=255, null=True)
+    batch_pattern = models.CharField(max_length=300, null=True)
     pause_time = models.IntegerField(default=0)
     mode = models.CharField(max_length=1, choices=MODE_CHOICES, default=AUTO)
 
